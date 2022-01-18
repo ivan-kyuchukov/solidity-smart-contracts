@@ -12,6 +12,19 @@
 			},
 			{
 				"inputs": [],
+				"name": "getBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "getOwner",
 				"outputs": [
 					{
@@ -21,6 +34,13 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getTokens",
+				"outputs": [],
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
@@ -65,10 +85,10 @@
 	},
 	"sources": {
 		"contracts/StartStopUpdate.sol": {
-			"keccak256": "0x1d0c537c49533494e20fd379e0191da91f38f9b8cc5c0f0eb65fabf82d7e04c6",
+			"keccak256": "0x97a508add922ca8659049d4f382e9d960537e1ac0bc8df9fad22456fcb25aa8a",
 			"urls": [
-				"bzz-raw://3836f96307dbc40f66a6dbb5b7d14e944256f659e3b1c314067d41e62611b330",
-				"dweb:/ipfs/QmRujMCdcXjitV3P2Wo9fdpavWwxQX6iWNsQfieSxsBjTZ"
+				"bzz-raw://141968234ea5b78c4c16042e60876ef80a740b95d78e8fd40eb0c66e2b5df6c4",
+				"dweb:/ipfs/QmVGhpV6yy8LDMPyMrBxBqpaPx1YcR1hbQk1g6mfJKeaCb"
 			]
 		}
 	},
