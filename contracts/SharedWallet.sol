@@ -1,58 +1,31 @@
+// SPDX-License-Identifier: FTL
 pragma solidity ^0.8.4;
 
-contract SharedWallet {
+import "./BaseContract.sol";
+import "./Allowance.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
 
-    struct Properties {
-        uint balance;
-        uint allowance;
-        uint remainingAllowance;
-    }
+contract SharedWallet is Allowance, BaseContract {
 
-    address owner;
-    mapping(address => Properties) private addressBook;
+    using SafeMath for uint;
 
-    event MyEvent(address from, address to, uint tokens);
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    function getContractBalance() public view returns (uint) {
-        return address(this).balance;
-    }
-
-    function getAddressBalance(address addressToCheck) public view returns (uint) {
-        return addressBook[addressToCheck].balance;
-    }
-
-    function sendTokens() public payable {
-        addressBook[msg.sender].balance += msg.value;
-    }
-
-    function withdrawTokens(address payable _to, uint tokensToWithdraw) public {
-        bool isOwner = _to == owner;
-        uint allowance = isOwner ? address(this).balance : addressBook[_to].allowance;
-        require(tokensToWithdraw <= addressBook[_to].balance, "Insufficient balance!");
-        require(tokensToWithdraw <= allowance, "You are not allowed to withdraw that amount!");
-
-        emit MyEvent(msg.sender, _to, 123);
-
-        if (addressBook[_to].remainingAllowance - tokensToWithdraw <= 0) {
-            addressBook[_to].remainingAllowance = 0;
-        }
-        else {
-            addressBook[_to].remainingAllowance -= tokensToWithdraw;
-        }
-         
-
-        addressBook[_to].balance -= tokensToWithdraw;
+    event TokensReceived(address indexed _fromWho, uint _amount);
+    event TokensWithdrawn(address _byWho, address indexed _toWho, uint _amount);
+    
+    function withdrawTokens(address payable _to, uint tokensToWithdraw) public payable ownerOrAllowed(tokensToWithdraw) {
+        require(tokensToWithdraw <= address(this).balance, "There's not enough tokens in the contract!");
+        addressBook[_to].balance = addressBook[_to].balance.sub(tokensToWithdraw, "There's not enough tokens in the address balance!");
         _to.transfer(tokensToWithdraw);
+        emit TokensWithdrawn(msg.sender, _to, tokensToWithdraw);
     }
 
-    function changeAddressAllowance(address addressToChange, uint newAllowance) public {
-        require(msg.sender == owner, "You're not the owner!");
-        addressBook[addressToChange].remainingAllowance = newAllowance;
-        addressBook[addressToChange].allowance = newAllowance;
+    receive() external payable {
+        addressBook[msg.sender].balance += msg.value;
+        emit TokensReceived(msg.sender, msg.value);
     }
 
+    function renounceOwnership() override public view onlyOwner {
+        revert("Can't renounce ownership here.");
+    }
 }
